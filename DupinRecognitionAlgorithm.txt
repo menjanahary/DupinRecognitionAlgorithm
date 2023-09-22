@@ -1,0 +1,200 @@
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"This file contains interactive maple code for checking";
+"whether a given implicit equation of a Darboux cyclide is";
+"a Dupin cyclide or not. It also contains the computation ";
+" of a Moebius invariant - extension of the torus invariant";
+" J0 = (1-r^2/R^2)*(r^2/R^2) - to general equation of Dupin";
+" cyclides - see https://arxiv.org/abs/2212.14015";
+
+
+
+
+###### DUPIN CYCLIDES RECOGNITION PROCEDURE #######
+
+IsDupin:=proc(Darb)
+	description "decide whether a given Darboux cyclide Darb is a Dupin cyclide or not";
+        # local variables declaration;
+	local darb0, darb,SU,SW,CO,EO,WA,WB,LL2,LL3,LL41,LL42,LL43,LL44,a,b,c,d,e,f,g,h,j,k,l,m,n; 
+	SW:={x=0,y=0,z=0};
+	if degree(Darb,[x,y,z])=4 then
+		darb0:=collect(Darb/coeff(Darb,x,4),[x,y,z],distributed);
+		SU:={x=x-coeff(darb0,x,3)/4,y=y-coeff(darb0,y,3)/4,z=z-coeff(darb0,z,3)/4};
+		darb :=collect(expand(subs(SU,darb0)),[x,y,z],distributed); 
+		d,e,f:=subs(SW,coeff(darb,x,2)),subs(SW,coeff(darb,y,2)),subs(SW,coeff(darb,z,2));
+		g,h,j:=subs(SW,coeff(coeff(darb,x,1),y,1))/2,subs(SW,coeff(coeff(darb,x,1),z,1))/2,subs(SW,coeff(coeff(darb,y,1),z,1))/2;
+		k,l,m:=subs(SW,coeff(darb,x,1))/2,subs(SW,coeff(darb,y,1))/2,subs(SW,coeff(darb,z,1))/2;
+		n:=subs(SW,darb);
+		CO := factor(d+e+f); 
+		EO := factor(k^2+l^2+m^2);
+		WA := factor(d*e+d*f+e*f-g^2-h^2-j^2+4*n); 
+		WB := factor((d+e)*g^2+(d+f)*h^2+(e+f)*j^2+2*g*h*j-(d+e)*(d+f)*(e+f));
+		if factor(k)<>0 then
+			LL41:=factor([
+			(d-f)*k*m+h*(-k^2+m^2)+(g*m-j*k)*l, 
+   			(d-e)*k*l+g*(-k^2+l^2)+(h*l-j*k)*m,
+			(WA-(e+f)^2-g^2-h^2)*k+(d*g+e*g+2*f*g-h*j)*l+(d*h+2*e*h+f*h-g*j)*m, 
+			2*(d*k+g*l+h*m)*WA+k*(WB-4*EO)
+			]):
+			if sum(LL41[i]^2,i=1..4)=0 then
+				"It is a quartic Dupin cyclide.";
+			else
+				"It is not a Dupin cyclide.";
+			end if;
+		elif factor(l)<>0 then
+			LL42:=factor([
+			(f-e)*l*m+j*(l^2-m^2)+(h*l-g*m)*k, 
+   			(d-e)*k*l+g*(-k^2+l^2)+(h*l-j*k)*m,
+			(d*g+e*g+2*f*g-h*j)*k+(WA-(d+f)^2-g^2-j^2)*l+(2*d*j+e*j+f*j-g*h)*m, 
+			2*(e*l+g*k+j*m)*WA+l*(WB-4*EO)
+			]):
+			if sum(LL42[i]^2,i=1..4)=0 then
+				"It is a quartic Dupin cyclide.";
+			else
+				"It is not a Dupin cyclide.";
+			end if;
+		elif factor(m)<>0 then
+			LL43:=factor([
+			(f-e)*l*m+j*(l^2-m^2)+(h*l-g*m)*k, 
+   			(d-f)*k*m+h*(-k^2+m^2)+(g*m-j*k)*l,
+			(d*h+2*e*h+f*h-g*j)*k+(2*d*j+e*j+f*j-g*h)*l+(WA-(d+e)^2-h^2-j^2)*m, 
+			2*(f*m+h*k+j*l)*WA+m*(WB-4*EO)
+			]):
+			if sum(LL43[i]^2,i=1..4)=0 then
+				"It is a quartic Dupin cyclide.";
+			else
+				"It is not a Dupin cyclide.";
+			end if;
+		else
+			LL44:= factor([
+			WA*(4*WA-3*CO^2-4*n)-2*CO*WB,
+			4*WA*WB+(2*CO*WA+WB)*(CO^2-4*n),
+			(WB+(2*(d+e+f))*WA)^2-4*WA^3
+			]):
+			if sum(LL44[i]^2,i=1..3)=0 then
+				"It is a quartic Dupin cyclide.";
+			else
+				"It is not a Dupin cyclide.";
+			end if;
+		end if;
+	elif degree(Darb,[x,y,z])=3 then
+	     	a,b,c:=subs(SW,coeff(Darb,x,3))/2,subs(SW,coeff(Darb,y,3))/2,subs(SW,coeff(Darb,z,3))/2;
+		d,e,f:=subs(SW,coeff(Darb,x,2)),subs(SW,coeff(Darb,y,2)),subs(SW,coeff(Darb,z,2));
+		g,h,j:=subs(SW,coeff(coeff(Darb,x,1),y,1))/2,subs(SW,coeff(coeff(Darb,x,1),z,1))/2,subs(SW,coeff(coeff(Darb,y,1),z,1))/2;
+		k,l,m:=subs(SW,coeff(Darb,x,1))/2,subs(SW,coeff(Darb,y,1))/2,subs(SW,coeff(Darb,z,1))/2;
+		n:=subs(SW,Darb);
+	        LL3:=[
+			-6*k*(a^2+b^2+c^2)^2+2*a*(a^2+b^2+c^2)*(a*k+b*l+c*m)
+			+a*(g^2+h^2-j^2)*(a^2+2*b^2+2*c^2)-7*a*(b*g+c*h)^2
+			+a^2*(b*e*g+b*h*j+c*f*h+c*g*j)+3*(b*h-c*g)*((b^2-c^2)*j-b*c*(e-f))
+			+4*a^2*(e-d+f)*(b*g+c*h)+2*a*b*c*j*(e-d+f)+3*d*(b^2+c^2)*(b*g+c*h)
+			+a*(2*d^2*(b^2+c^2)-e^2*(a^2+c^2)-f^2*(a^2+b^2)
+			+(a^2-b^2-c^2)*(d*e+d*f-e*f)-d*(b^2*e+c^2*f)),
+
+			6*l*(a^2+b^2+c^2)^2-2*b*(a^2+b^2+c^2)*(a*k+b*l+c*m)
+			-b*(g^2-h^2+j^2)*(2*a^2+b^2+2*c^2)+7*b*(a*g+c*j)^2
+			-b^2*(a*d*g+a*h*j+c*f*j+c*g*h)-3*(a*j-c*g)*((a^2-c^2)*h-a*c*(d-f))
+			-4*b^2*(d-e+f)*(a*g+c*j)-2*b*a*c*h*(d-e+f)-3*e*(a^2+c^2)*(a*g+c*j)
+			-b*(2*e^2*(a^2+c^2)-d^2*(b^2+c^2)-f^2*(a^2+b^2)
+			+(-a^2+b^2-c^2)*(d*e-d*f+e*f)-e*(a^2*d+c^2*f)),
+
+			6*m*(a^2+b^2+c^2)^2-2*c*(a^2+b^2+c^2)*(a*k+b*l+c*m)
+			-c*(-g^2+h^2+j^2)*(2*a^2+2*b^2+c^2)+7*c*(a*h+b*j)^2
+			-c^2*(a*d*h+a*g*j+b*e*j+b*g*h)-3*(-a*j+b*h)*((-a^2+b^2)*g
+			-b*a*(e-d))-4*c^2*(e-f+d)*(a*h+b*j)-2*c*b*a*g*(e-f+d)-3*f*(a^2+b^2)*(a*h+b*j)
+			-c*(2*f^2*(a^2+b^2)-e^2*(a^2+c^2)-d^2*(b^2+c^2)
+			+(-a^2-b^2+c^2)*(-d*e+d*f+e*f)-f*(a^2*d+b^2*e)),
+
+			-24*(a^2+b^2+c^2)^2*n
+			-(2*(3*b*(3*a^2+b^2+c^2)*g+3*c*(3*a^2+b^2+c^2)*h+6*a*b*c*j
+			+a*(2*a^2-b^2-c^2)*d-a*(4*a^2+b^2+4*c^2)*e-a*(4*a^2+4*b^2+c^2)*f))*k
+			-(2*(3*a*(a^2+3*b^2+c^2)*g+3*c*(a^2+3*b^2+c^2)*j+6*a*b*c*h
+			-b*(a^2+4*b^2+4*c^2)*d-b*(a^2-2*b^2+c^2)*e-b*(4*a^2+4*b^2+c^2)*f))*l
+			-(2*(3*a*(a^2+b^2+3*c^2)*h+3*b*(a^2+b^2+3*c^2)*j+6*a*b*c*g
+			-c*(a^2+4*b^2+4*c^2)*d-c*(4*a^2+b^2+4*c^2)*e-c*(a^2+b^2-2*c^2)*f))*m
+			-12*(g^2+h^2+j^2)*(a*b*g+a*c*h+b*c*j)+(18*(a^2+b^2+c^2))*g*h*j
+			-2*(d+e+f)*(a*b*h*j+a*c*g*j+b*c*g*h)
+			+((a^2+7*b^2+8*c^2)*d+(7*a^2+b^2+8*c^2)*e-(2*a^2+2*b^2+7*c^2)*f)*g^2
+			+((a^2+8*b^2+7*c^2)*d-(2*a^2+7*b^2+2*c^2)*e+(7*a^2+8*b^2+c^2)*f)*h^2
+			+(-(7*a^2+2*b^2+2*c^2)*d+(8*a^2+b^2+7*c^2)*e+(8*a^2+7*b^2+c^2)*f)*j^2
+			-2*a*b*(2*d^2-2*d*e-3*d*f+2*e^2-3*e*f+f^2)*g
+			-2*a*c*(2*d^2-3*d*e-2*d*f+e^2-3*e*f+2*f^2)*h
+			-2*b*c*(d^2-3*d*e-3*d*f+2*e^2-2*e*f+2*f^2)*j
+			+(d^2*e+d^2*f-3*d*e^2+d*e*f-3*d*f^2+2*e^3-2*e^2*f-2*e*f^2+2*f^3)*a^2
+			+(2*d^3-3*d^2*e-2*d^2*f+d*e^2+d*e*f-2*d*f^2+e^2*f-3*e*f^2+2*f^3)*b^2
+			+(2*d^3-2*d^2*e-3*d^2*f-2*d*e^2+d*e*f+d*f^2+2*e^3-3*e^2*f+e*f^2)*c^2
+			];
+		if factor(sum(LL3[i]^2,i=1..4))=0 then
+			"It is a parabolic Dupin cyclide.";
+		else
+			"It is not a Dupin cyclide.";
+    		end if;
+
+	else    
+                d,e,f:=subs(SW,coeff(Darb,x,2)),subs(SW,coeff(Darb,y,2)),subs(SW,coeff(Darb,z,2));
+		g,h,j:=subs(SW,coeff(coeff(Darb,x,1),y,1))/2,subs(SW,coeff(coeff(Darb,x,1),z,1))/2,subs(SW,coeff(coeff(Darb,y,1),z,1))/2;
+		LL2:=factor([
+				g*h^2-d*h*j+e*h*j-g*j^2,
+				g^2*h-d*g*j+f*g*j-h*j^2,
+				e*g*h-f*g*h-g^2*j+h^2*j,
+				2*d*g*h-e*g*h-f*g*h-2*d^2*j+2*d*e*j+2*d*f*j-2*e*f*j-g^2*j-h^2*j+2*j^3,
+				d*e*h-e^2*h-d*f*h+e*f*h-8*g^2*h+h^3+7*d*g*j+e*g*j-8*f*g*j+7*h*j^2,
+				2*d*e*g-2*d*f*g-2*e*f*g+2*f^2*g-2*g^3+g*h^2+d*h*j+e*h*j-2*f*h*j+g*j^2,
+				d^2*e-d*e^2-d^2*f+e^2*f+d*f^2-e*f^2-d*g^2+e*g^2+d*h^2-f*h^2-e*j^2+f*j^2
+                		]);
+                if factor(sum(LL2[i]^2,i=1..7))=0 then
+			"It is a quadratic Dupin cyclide.";
+		else
+			"It is not a Dupin cyclide.";
+		end if;
+	end if;
+end proc:
+
+###### IMPLICIT MOEBIUS INVARIANT CLASSIFYING DUPIN CYCLIDES #######
+
+J0:=proc(Darb)
+	local SW,darb0,SU,darb,a,b,c,d,e,f,g,h,j,k,l,m,n,CO,EO,W0,W1,NJ0,DJ0,Y5,Y6,BO;
+	SW:={x=0,y=0,z=0};
+	if degree(Darb,[x,y,z])=4 then
+		darb0:=collect(Darb/coeff(Darb,x,4),[x,y,z],distributed);
+		SU:={x=x-coeff(darb0,x,3)/4,y=y-coeff(darb0,y,3)/4,z=z-coeff(darb0,z,3)/4};
+		darb :=collect(expand(subs(SU,darb0)),[x,y,z],distributed);
+		d,e,f:=subs(SW,coeff(darb,x,2)),subs(SW,coeff(darb,y,2)),subs(SW,coeff(darb,z,2));
+		g,h,j:=subs(SW,coeff(coeff(darb,x,1),y,1))/2,subs(SW,coeff(coeff(darb,x,1),z,1))/2,subs(SW,coeff(coeff(darb,y,1),z,1))/2;
+		k,l,m:=subs(SW,coeff(darb,x,1))/2,subs(SW,coeff(darb,y,1))/2,subs(SW,coeff(darb,z,1))/2;
+		n:=subs(SW,darb);
+		CO := factor(d+e+f); 
+		EO := factor(k^2+l^2+m^2);
+        	W0 := d*e*f+2*g*h*j-d*j^2-e*h^2-f*g^2;
+        	W1 := d*e+d*f+e*f-g^2-h^2-j^2; 
+       		NJ0:=(4*n-CO^2)*(28*n+CO^2)+4*W1*(8*n+CO^2)+12*CO*(2*EO-W0);
+        	DJ0:= 12*n*(4*n-CO^2)+W1*(28*n+CO^2)+8*CO*(2*EO-W0);
+        	factor(NJ0/DJ0);
+	elif degree(Darb,[x,y,z])=3 then
+	     	a,b,c:=subs(SW,coeff(Darb,x,3))/2,subs(SW,coeff(Darb,y,3))/2,subs(SW,coeff(Darb,z,3))/2;
+		d,e,f:=subs(SW,coeff(Darb,x,2)),subs(SW,coeff(Darb,y,2)),subs(SW,coeff(Darb,z,2));
+		g,h,j:=subs(SW,coeff(coeff(Darb,x,1),y,1))/2,subs(SW,coeff(coeff(Darb,x,1),z,1))/2,subs(SW,coeff(coeff(Darb,y,1),z,1))/2;
+		k,l,m:=subs(SW,coeff(Darb,x,1))/2,subs(SW,coeff(Darb,y,1))/2,subs(SW,coeff(Darb,z,1))/2;
+		n:=subs(SW,Darb);
+		CO := d+e+f;
+		BO:=a^2+b^2+c^2;
+		Y5:=g^2+h^2+j^2-4*a*k-4*b*l-4*c*m;
+		Y6:=5*a^2*j^2+5*b^2*h^2+5*c^2*g^2+10*a*b*(f*g-h*j)+10*a*c*(e*h-g*j)+10*b*c*(d*j-g*h)-2*CO*(a*b*g+a*c*h+b*c*j)-a^2*(d^2+4*e*f)-b^2*(e^2+4*d*f)-c^2*(f^2+4*d*e);
+		NJ0:=3*BO*(d*e+d*f+e*f-2*Y5)+3*Y6;
+		DJ0:= BO*(d*e+d*f+e*f+2*d^2+2*e^2+2*f^2+Y5)+2*Y6;
+		factor(NJ0/DJ0);
+	else 
+		"error";
+	end if;
+end proc:
