@@ -16,9 +16,14 @@ Step 5: Enter your Darboux cyclide equation to investigate and apply the algorit
 
 Remark: After you dowload all the repository files in one folder, you may execute the maple file "read_example.mw".
 
-CONTACT INFORMATION:\n
-Feel free to reach out if you find any bugs, have a suggestion, or just to keep in touch:\n
-Author: Jean Michel Menjanahary\n
-Email address: jean.menjanahary@mif.vu.lt\n
-Institution: Institute of Computer Science, Vilnius University\n
+CONTACT INFORMATION:
+
+Feel free to reach out if you find any bugs, have a suggestion, or just to keep in touch:
+
+Author: Jean Michel Menjanahary
+
+Email address: jean.menjanahary@mif.vu.lt
+
+Institution: Institute of Computer Science, Vilnius University
+
 Address: Didlaukio str. 47, LT-08303, Vilnius, Lithuania
